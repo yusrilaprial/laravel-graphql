@@ -1,0 +1,56 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Query {
+  usersPage(orderBy: [OrderByClause!] @orderBy): [User!]! @paginate(defaultCount: 10)
+  users: [User!]! @all
+  user(id: ID! @eq): User @find
+
+  postsPage(orderBy: [OrderByClause!] @orderBy): [Post!]! @paginate(defaultCount: 10)
+  posts: [Post!]! @all
+  post(id: Int! @eq): Post @find
+
+  commentsPage(orderBy: [OrderByClause!] @orderBy): [Comment!]! @paginate(defaultCount: 10)
+  comments: [Comment!]! @all
+  comment(id: ID @eq): Comment @find
+}
+
+type Mutation {
+  createUser(name: String!, email: String!, password: String!): User! @create
+  updateUser(id: ID! @eq, name: String, email: String, password: String): User! @update
+  upsertUser(id: ID, name: String!, email: String!, password: String!): User! @upsert
+  deleteUser(id: ID! @eq): User @delete
+
+  createPost(title: String!, content: String!, author_id: Int!): Post! @create
+  updatePost(id: ID! @eq, title: String, content: String, author_id: Int): Post! @update
+  upsertPost(id: ID, title: String!, content: String!, author_id: Int!): Post! @upsert
+  deletePost(id: ID! @eq): Post @delete
+
+  createComment(reply: String!, post_id: Int!): Comment! @create
+  updateComment(id: ID! @eq, reply: String, post_id: Int): Comment! @update
+  upsertComment(id: ID, reply: String!, post_id: Int!): Comment! @upsert
+  deleteComment(id: ID! @eq): Comment @delete
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  posts: [Post!]! @hasMany
+}
+
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  author: User! @belongsTo
+  comments: [Comment!]! @hasMany
+}
+
+type Comment {
+  id: ID!
+  reply: String!
+  post: Post! @belongsTo
+}
